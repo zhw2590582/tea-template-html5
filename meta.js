@@ -1,106 +1,56 @@
 module.exports = {
   before: (metalsmith, opts, helpers) => {
-    console.log('before');
-  },
-  helpers: {
-    if_or(v1, v2, options) {
-
-      if (v1 || v2) {
-        return options.fn(this)
-      }
-
-      return options.inverse(this)
-    },
-    template_version() {
-      return templateVersion
-    },
+    let logger = helpers.logger;
+    logger.log('Install before');
   },
   prompts: {
     name: {
       type: 'string',
       required: true,
       message: 'Project name',
+      validate: value => {
+        if(value.length <= 2){
+          return 'Please enter a name longer than 2';
+        }
+        return true;
+      }
     },
     description: {
       type: 'string',
-      required: false,
       message: 'Project description',
-      default: 'A Vue.js project',
+      default: 'My project description'
     },
     author: {
       type: 'string',
       message: 'Author',
+      default: 'My Name'
     },
-    build: {
-      type: 'list',
-      message: 'Vue build',
-      choices: [
-        {
-          name: 'Runtime + Compiler: recommended for most users',
-          value: 'standalone',
-          short: 'standalone',
-        },
-        {
-          name:
-            'Runtime-only: about 6KB lighter min+gzip, but templates (or any Vue-specific HTML) are ONLY allowed in .vue files - render functions are required elsewhere',
-          value: 'runtime',
-          short: 'runtime',
-        },
-      ],
-    },
-    router: {
+    useCssCompiler: {
       type: 'confirm',
-      message: 'Install vue-router?',
+      message: 'Install css compiler?',
     },
-    lintConfig: {
-      when: answers => answers.router,
+    cssCompiler: {
+      when: 'useCssCompiler',
       type: 'list',
-      message: 'Pick an ESLint preset',
+      message: 'Css compiler',
       choices: [
         {
-          name: 'Standard (https://github.com/standard/standard)',
-          value: 'standard',
-          short: 'Standard',
+          name: 'Sass',
+          value: 'sass'
         },
         {
-          name: 'Airbnb (https://github.com/airbnb/javascript)',
-          value: 'airbnb',
-          short: 'Airbnb',
-        },
-        {
-          name: 'none (configure it yourself)',
-          value: 'none',
-          short: 'none',
+          name: 'Less',
+          value: 'less'
         },
       ],
-    },
-    autoInstall: {
-      type: 'list',
-      message:
-        'Should we run `npm install` for you after the project has been created? (recommended)',
-      choices: [
-        {
-          name: 'Yes, use NPM',
-          value: 'npm',
-          short: 'npm',
-        },
-        {
-          name: 'Yes, use Yarn',
-          value: 'yarn',
-          short: 'yarn',
-        },
-        {
-          name: 'No, I will handle that myself',
-          value: false,
-          short: 'no',
-        },
-      ],
-    },
+    }
   },
   filters: {
-
+    'sass/*': "useCssCompiler && cssCompiler === 'sass'",
+    'less/*': "useCssCompiler && cssCompiler === 'less'"
   },
   complete: (data, files, helpers) => {
-    console.log('complete');
+    let logger = helpers.logger;
+    logger.log('Install complete');
   }
 };
